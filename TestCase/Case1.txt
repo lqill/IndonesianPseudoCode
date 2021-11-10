@@ -1,0 +1,5 @@
+#Deklarasi
+string kalimat
+#Intruksi
+kalimat = "teks"
+cetak kalimat
