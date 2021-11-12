@@ -1,5 +1,6 @@
 #Deklarasi
-string kalimat
+String kalimat
 #Intruksi
 kalimat = "teks"
-cetak kalimat
+Cetak kalimat
+angka = 1
