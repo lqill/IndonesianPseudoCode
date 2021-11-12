@@ -98,7 +98,7 @@ class Interpreter:
                                 self.var[keys[0]].set(eval(keys[1]))
                             except KeyError as e:
                                 print(
-                                    f"ERROR Baris ke-{idx+1} : Variabel {e} belum dideklarasikan".)
+                                    f"ERROR Baris ke-{idx+1} : Variabel {e} belum dideklarasikan")
                                 error = True
                                 break
                             except TypeError as e:
