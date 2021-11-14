@@ -34,6 +34,7 @@ class Var:
 class Interpreter:
     def __init__(self) -> None:
         self.lines = []
+        self.output = ""
         self.keys = {
             "String": str(),
             "Integer": int(),
@@ -50,7 +51,10 @@ class Interpreter:
             "Intruksi": []
         }
 
-    def parse(self, file):
+    def parse(self, text: str):
+        self.lines = text.splitlines()
+
+    def open(self, file):
         with open(file, 'r') as fp:
             self.lines = fp.read().splitlines()
 
@@ -79,7 +83,8 @@ class Interpreter:
                 else:
                     self.modul[modul_name].append([idx+1, line])
 
-    def run(self):
+    def run_old(self):
+        output = ""
         error = False
         for mode in [self.modul["Deklarasi"], self.modul["Intruksi"]]:
             for parsed in mode:
@@ -98,12 +103,14 @@ class Interpreter:
                                 self.var[keys[0]].set(eval(keys[1]))
                             except KeyError as e:
                                 print(
-                                    f"ERROR Baris ke-{idx+1} : Variabel {e} belum dideklarasikan")
+                                    f"ERROR Baris ke-{idx} : Variabel {e} belum dideklarasikan")
+                                output += f"ERROR Baris ke-{idx} : Variabel {e} belum dideklarasikan\n"
                                 error = True
                                 break
                             except TypeError as e:
                                 print(
-                                    f"ERROR Baris ke-{idx+1} : Variabel {keys[0]} bertipe {type(self.var[keys[0]].type)} sedangkan {e} bertipe {type(e.args[0])}")
+                                    f"ERROR Baris ke-{idx} : Variabel {keys[0]} bertipe {type(self.var[keys[0]].type)} sedangkan {e} bertipe {type(e.args[0])}")
+                                output += f"ERROR Baris ke-{idx} : Variabel {keys[0]} bertipe {type(self.var[keys[0]].type)} sedangkan {e} bertipe {type(e.args[0])}\n"
                                 error = True
                                 break
                         # print(keys)
@@ -119,11 +126,13 @@ class Interpreter:
                             elif keys[0] == "UlangJika":
                                 pass
                         if keys[0] == "Cetak":
-                            print(keys[1])
+                            print(self.var[keys[1]].value)
+                            output += str(self.var[keys[1]].value)+"\n"
                         elif keys[0] == "Input":
-                            self.var[keys[1]] = input()
+                            self.var[keys[1]].value = input()
                         elif keys[0] == "Tipe":
-                            print(type(keys[1]))
+                            print(self.var[keys[1]].type)
+                            output += str(self.var[keys[1]].type)+"\n"
                         else:
                             try:
                                 var_type = keys[0]
@@ -133,6 +142,14 @@ class Interpreter:
                                 error = True
                                 break
                 e = 1
+        return output
+
+    def run(self, text):
+        self.output = ""
+        self.parse(text)
+        self.strip()
+        self.output = self.run_old()
+        self.output += "\n\n\n\n\n"
 
 
 def main():
