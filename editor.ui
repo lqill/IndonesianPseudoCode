@@ -59,6 +59,11 @@
         <height>491</height>
        </rect>
       </property>
+      <property name="plainText">
+       <string>#DEKLARASI
+
+#INTRUKSI</string>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_2">

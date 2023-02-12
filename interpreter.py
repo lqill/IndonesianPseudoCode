@@ -83,81 +83,106 @@ class Interpreter:
                 else:
                     self.modul[modul_name].append([idx+1, line])
 
-    def run_old(self):
-        output = ""
+    def process(self, idx, line):
+        if "=" in line:
+            keys = line.replace(" ", "").split("=")
+            if any(c in keys[1] for c in ["+", "-", "*", "/", "%"]):
+                pass
+            else:
+                try:
+                    _ = self.var[keys[0]]
+                    self.var[keys[0]].set(eval(keys[1]))
+                except KeyError as e:
+                    print(
+                        f"ERROR Baris ke-{idx} : Variabel {e} belum dideklarasikan")
+                    self.output += f"ERROR Baris ke-{idx} : Variabel {e} belum dideklarasikan\n"
+                    error = True
+                    raise NameError()
+                except TypeError as e:
+                    print(
+                        f"ERROR Baris ke-{idx} : Variabel {keys[0]} bertipe {type(self.var[keys[0]].type)} sedangkan {e} bertipe {type(e.args[0])}")
+                    self.output += f"ERROR Baris ke-{idx} : Variabel {keys[0]} bertipe {type(self.var[keys[0]].type)} sedangkan {e} bertipe {type(e.args[0])}\n"
+                    error = True
+                    raise TypeError()
+            # print(keys)
+        else:
+            keys = line.split(" ")
+            if keys[-1] == "MAKA":
+                # this is for the if/else,for, while
+                if keys[0] == "JIKA":
+                    self.state = "ifelse"
+                    print(keys)
+                elif keys[0] == "UNTUK":
+                    self.state = "for"
+                elif keys[0] == "ULANGJIKA":
+                    self.state = "while"
+            if keys[0] == "SELESAI":
+                # TODO ENDIF ENDFOR ENDWHILE
+                pass
+            if keys[0] == "CETAK":
+                print(self.var[keys[1]].value)
+                self.output += str(self.var[keys[1]].value)+"\n"
+            elif keys[0] == "INPUT":
+                # TODO:TAMBAHI TEXT BOX UNTUK INPUT
+                self.var[keys[1]].value = input()
+            elif keys[0] == "TIPE":
+                print(self.var[keys[1]].type)
+                self.output += str(self.var[keys[1]].type)+"\n"
+            else:
+                try:
+                    var_type = keys[0]
+                    self.var[keys[1]] = Var(var_type)
+                except:
+                    print(
+                        f"ERROR Baris ke-{idx} : Salah pengetikan atau menyalahi aturan syntax")
+                    self.output += f"ERROR Baris ke-{idx} : Salah pengetikan atau menyalahi aturan syntax"
+                    error = True
+                    raise SyntaxError()
+
+    def run(self, text):
+        self.output = ""
+        self.condition = False
+        self.parse(text)
+        self.strip()
         error = False
-        for mode in [self.modul["Deklarasi"], self.modul["Intruksi"]]:
+        self.state = "normal"
+        for mode in [self.modul["DEKLARASI"], self.modul["INTRUKSI"]]:
             for parsed in mode:
                 if not error:
                     idx = parsed[0]
                     line = parsed[1]
                     # print(idx, line)
+                    if self.state == "normal":
+                        self.process(idx, line)
+                    elif self.state == "ifelse":
+                        pass
+                    elif self.state == "for":
+                        pass
+                    elif self.state == "while":
+                        loop = []
+                        for i in mode[idx-mode[0][0]:]:
+                            if i[1] == "SELESAI":
+                                while True:
+                                    break
+                                    # for j in
 
-                    if "=" in line:
-                        keys = line.replace(" ", "").split("=")
-                        if any(c in keys[1] for c in ["+", "-", "*", "/", "%"]):
-                            pass
-                        else:
-                            try:
-                                _ = self.var[keys[0]]
-                                self.var[keys[0]].set(eval(keys[1]))
-                            except KeyError as e:
-                                print(
-                                    f"ERROR Baris ke-{idx} : Variabel {e} belum dideklarasikan")
-                                output += f"ERROR Baris ke-{idx} : Variabel {e} belum dideklarasikan\n"
-                                error = True
-                                break
-                            except TypeError as e:
-                                print(
-                                    f"ERROR Baris ke-{idx} : Variabel {keys[0]} bertipe {type(self.var[keys[0]].type)} sedangkan {e} bertipe {type(e.args[0])}")
-                                output += f"ERROR Baris ke-{idx} : Variabel {keys[0]} bertipe {type(self.var[keys[0]].type)} sedangkan {e} bertipe {type(e.args[0])}\n"
-                                error = True
-                                break
-                        # print(keys)
-                    else:
-                        keys = line.split(" ")
-                        if keys[-1] == "Maka":
-                            # this is for the loop and if/else
-                            pass
-                            if keys[0] == "Jika":
-                                pass
-                            elif keys[0] == "Untuk":
-                                pass
-                            elif keys[0] == "UlangJika":
-                                pass
-                        if keys[0] == "Cetak":
-                            print(self.var[keys[1]].value)
-                            output += str(self.var[keys[1]].value)+"\n"
-                        elif keys[0] == "Input":
-                            self.var[keys[1]].value = input()
-                        elif keys[0] == "Tipe":
-                            print(self.var[keys[1]].type)
-                            output += str(self.var[keys[1]].type)+"\n"
-                        else:
-                            try:
-                                var_type = keys[0]
-                                self.var[keys[1]] = Var(var_type)
-                            except:
-                                print("error")
-                                error = True
-                                break
-                e = 1
-        return output
+    # Logic
 
-    def run(self, text):
-        self.output = ""
-        self.parse(text)
-        self.strip()
-        self.output = self.run_old()
-        self.output += "\n\n\n\n\n"
+    def ifelse(self):
+        pass
+
+    def for_loop(self):
+        pass
+
+    def while_loop(self):
+        pass
 
 
 def main():
-    file = "TestCase/Case1.txt"
+    file = "TestCase/case1.txt"
     I = Interpreter()
-    I.parse(file)
-    I.strip()
-    I.run()
+    with open(file, 'r') as fp:
+        I.run(fp.read())
 
 
 if __name__ == "__main__":
