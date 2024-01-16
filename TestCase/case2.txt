@@ -1,0 +1,9 @@
+#Deklarasi
+Integer x
+#Intruksi
+x = 10
+Jika x > 5 Maka
+    Cetak "Besar"
+JikaTidak
+    Cetak "Kecil"
+Selesai

@@ -1,0 +1,8 @@
+#Deklarasi
+Integer count
+#Intruksi
+count = 0
+Ulangjika count < 5 Maka
+    Cetak "Perulangan ke-" + count
+    count = count + 1
+Selesai

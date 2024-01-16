@@ -1,0 +1,7 @@
+#Deklarasi
+Integer n
+#Intruksi
+n = 5
+Untuk i Dari 1 Sampai n Maka
+    Cetak "Iterasi ke-" + i
+Selesai
